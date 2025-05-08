@@ -89,3 +89,29 @@ class Enrollment(db.Model):
         }
 
 
+class Lapicero(db.Model):
+    __tablename__ = 'lapiceros'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    color: Mapped[str] = mapped_column(String(20),nullable=False)
+    estuche_id: Mapped[int] = mapped_column(ForeignKey('estuches.id'))
+
+    estuche: Mapped['Estuche'] = relationship(back_populates='lapiceros')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            'color':self.color
+        }
+    
+class Estuche(db.Model):
+    __tablename__='estuches'
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    lapicero: Mapped['Lapicero'] = relationship(back_populates='estuche')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+        }
+
+
