@@ -11,6 +11,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
+    enrollments: Mapped['Enrollment'] = relationship(back_populates='user')
     
     profile: Mapped['Profile'] = relationship(back_populates='user', uselist=False)
     post: Mapped['Post'] = relationship(back_populates='user')
@@ -60,12 +61,31 @@ class Classroom(db.Model):
     className: Mapped[str]=mapped_column(String(50))
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     user: Mapped['User'] = relationship(back_populates='classroom')
+    enrollments: Mapped['Enrollment'] = relationship(back_populates='classroom')
 
 
     def serialize(self):
         return {
             "id": self.id,
             'className':self.className
+        }
+    
+
+class Enrollment(db.Model):
+    __tablename__ = 'enrollments'
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    classroom_id: Mapped[int] = mapped_column(ForeignKey('classrooms.id'))
+
+    # Relaciones hacia los modelos principales
+    user: Mapped['User'] = relationship(back_populates='enrollments')
+    classroom: Mapped['Classroom'] = relationship(back_populates='enrollments')
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            'user_id':self.user_id,
+            'classroom_id':self.user_id
         }
 
 
